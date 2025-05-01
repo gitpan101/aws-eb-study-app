@@ -1,10 +1,18 @@
 import express, { Application } from 'express';
+import router from './routes';
 
 const PORT = process.env.PORT || 5000;
 const app: Application = express();
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/api', router);
+// This code sets up an Express server that listens on a specified port and uses a router for API routes.
+// It also includes middleware for parsing JSON and URL-encoded data.
+
+app.get('/', (_req, res) => {
+  res.send('Welcome to the Todo API');
+  // This code defines a simple GET route for the root URL ("/") of the server.
 });
 
 app.listen(PORT, () => {

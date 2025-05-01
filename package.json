@@ -8,7 +8,8 @@
     "start:prod": "NODE_ENV=production node dist/server.js",
     "dev": "nodemon --watch src --ext ts --exec tsx src/server.ts",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "seed": "tsx src/db/seed.ts"
   },
   "devDependencies": {
     "@eslint/css": "^0.7.0",

@@ -1,4 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
+import { ToastContainer } from 'react-toastify';
+
 import Login from './pages/Login';
 
 function App() {
@@ -7,6 +9,8 @@ function App() {
       <Routes>
         <Route index element={<Login />} />
       </Routes>
+
+      <ToastContainer theme="colored" />
     </BrowserRouter>
   );
 }

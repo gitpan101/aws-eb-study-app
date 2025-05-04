@@ -1,10 +1,11 @@
+import { CSSProperties } from 'react';
+import { useForm } from 'react-hook-form';
 import { Button, Card, CardContent, TextField, Typography } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import Page from '../components/Page';
-import { useForm } from 'react-hook-form';
-import { CSSProperties } from 'react';
+import { login } from '../services/api';
 
 const schema = yup
   .object({
@@ -26,7 +27,18 @@ const Login = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: { email: string; password: string }) => console.log(data);
+  const onSubmit = async (formData: { email: string; password: string }) => {
+    const { status, data } = await login(formData.email, formData.password);
+    const responseData = data as {
+      message: string;
+      user: unknown;
+      token: string;
+    };
+
+    if (status === 200) {
+      console.log(responseData);
+    }
+  };
 
   return (
     <Page

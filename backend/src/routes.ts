@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
+
 import { query } from './db';
 
 const router = Router();
@@ -7,12 +9,17 @@ const router = Router();
 router.route('/login').post(async (req, res) => {
   const { email, password } = req.body;
   const result = await query(
-    'SELECT * FROM users WHERE email = $1 and password = $2',
+    'SELECT id, email, username FROM users WHERE email = $1 and password = $2',
     [email, password],
   );
 
   if (result.rows.length > 0) {
-    res.json({ message: 'Login successful', user: result.rows[0] });
+    const token = jwt.sign(
+      { user: result.rows[0] },
+      process.env.JWT_SECRET as string,
+    );
+
+    res.json({ message: 'Login successful', user: result.rows[0], token });
   } else {
     res.status(401).json({ message: 'Invalid email or password' });
   }

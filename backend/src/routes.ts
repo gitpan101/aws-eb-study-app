@@ -2,9 +2,11 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { query } from './db';
+import { authMiddleware } from './auth-middleware';
 
 const router = Router();
 
+// Public routes
 //auth
 router.route('/login').post(async (req, res) => {
   const { email, password } = req.body;
@@ -17,6 +19,7 @@ router.route('/login').post(async (req, res) => {
     const token = jwt.sign(
       { user: result.rows[0] },
       process.env.JWT_SECRET as string,
+      { expiresIn: '1h' },
     );
 
     res.json({ message: 'Login successful', user: result.rows[0], token });
@@ -24,6 +27,9 @@ router.route('/login').post(async (req, res) => {
     res.status(401).json({ message: 'Invalid email or password' });
   }
 });
+
+// Private routes start
+router.use(authMiddleware);
 
 // users
 router.route('/users').get(async (_req, res) => {

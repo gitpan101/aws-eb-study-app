@@ -6,6 +6,7 @@ import * as yup from 'yup';
 
 import Page from '../components/Page';
 import { login } from '../services/api';
+import { useNavigate } from 'react-router';
 
 const schema = yup
   .object({
@@ -19,6 +20,8 @@ const errorStyles: CSSProperties = {
 };
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -36,7 +39,10 @@ const Login = () => {
     };
 
     if (status === 200) {
-      console.log(responseData);
+      sessionStorage.setItem('auth-token', responseData.token);
+      sessionStorage.setItem('user', JSON.stringify(responseData.user));
+
+      navigate('/todos');
     }
   };
 

@@ -6,3 +6,7 @@ export const login = (email: string, password: string) => {
     password,
   });
 };
+
+export const getTodos = (userId: string) => {
+  return axiosInstance.get(`todos/${userId}`);
+};

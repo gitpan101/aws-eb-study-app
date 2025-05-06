@@ -43,7 +43,7 @@ export const authMiddleware = (
       // Handle invalid token
       console.error('Token is invalid');
       res.status(401).json({
-        message: 'Token is invalid!',
+        message: 'Token is invalid',
       });
     } else {
       // Handle other errors

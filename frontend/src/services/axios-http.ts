@@ -15,10 +15,16 @@ export const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config: Axios.AxiosXHRConfig<unknown>) => {
-  config.headers = {
-    ...config.headers,
-    Authorization: `Bearer token`,
-  };
+  if (!config.url.includes('login')) {
+    const token = sessionStorage.getItem('auth-token');
+
+    if (!token) window.location.href = '/login';
+
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${token}`,
+    };
+  }
 
   return config;
 });
@@ -36,6 +42,10 @@ axiosInstance.interceptors.response.use(
   (error: { response: IErrorResponse }) => {
     console.log('Error response:', error.response);
     toast.error(error.response.data.message);
+
+    if (['Token has expired', 'Token is invalid'].includes(error.response.data.message)) {
+      window.location.href = '/login';
+    }
 
     return error;
   }

@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
+import { ITodo } from '../pages/Todos';
 
-const Todo = () => {
+const Todo = ({ todo }: { todo: ITodo }) => {
   return (
     <Box
       sx={{
@@ -22,7 +23,7 @@ const Todo = () => {
           marginBottom: '8px',
         }}
       >
-        Submit document
+        {todo.title}
       </Box>
 
       <Box
@@ -30,7 +31,7 @@ const Todo = () => {
           overflow: 'hidden',
         }}
       >
-        Make sure to submit all the necessary documents. Make sure to submit all the necessary documents.
+        {todo.description}
       </Box>
     </Box>
   );

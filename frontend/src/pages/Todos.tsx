@@ -1,9 +1,10 @@
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import Page from '../components/Page';
 import Todo from '../components/Todo';
 import { useCallback, useEffect, useState } from 'react';
 import { getTodos as getTodosApi } from '../services/api';
 import { useNavigate } from 'react-router';
+import AddTodo from '../components/AddTodo';
 
 export interface ITodo {
   id: string;
@@ -17,6 +18,7 @@ export interface ITodo {
 const Todos = () => {
   const navigate = useNavigate();
   const [todos, setTodos] = useState<ITodo[]>([]);
+  const [openTodoForm, setOTF] = useState(false);
 
   const getTodos = useCallback(async () => {
     const user = sessionStorage.getItem('user');
@@ -36,24 +38,43 @@ const Todos = () => {
   }, [getTodos]);
 
   return (
-    <Page>
-      <h2>Todos</h2>
+    <>
+      <Page>
+        <Box
+          sx={{
+            display: 'inline-flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+          }}
+        >
+          <h2>Todos</h2>
 
-      <Box
-        sx={{
-          maxHeight: '800px',
-          overflowY: 'scroll',
-          p: 2,
-          borderRadius: 1,
-          border: '1px solid #F08080',
-          borderTop: '5px solid #F08080',
-        }}
-      >
-        {todos.map((todo) => (
-          <Todo key={todo.id} todo={todo} />
-        ))}
-      </Box>
-    </Page>
+          <Box>
+            <Button variant="contained" size="small" onClick={() => setOTF(true)}>
+              Add Todo
+            </Button>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            maxHeight: '800px',
+            overflowY: 'scroll',
+            p: 2,
+            borderRadius: 1,
+            border: '1px solid #F08080',
+            borderTop: '5px solid #F08080',
+          }}
+        >
+          {todos.map((todo) => (
+            <Todo key={todo.id} todo={todo} />
+          ))}
+        </Box>
+      </Page>
+
+      <AddTodo open={openTodoForm} setOpen={setOTF} />
+    </>
   );
 };
 

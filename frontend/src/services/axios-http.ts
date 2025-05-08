@@ -33,10 +33,11 @@ axiosInstance.interceptors.response.use(
   (response) => {
     const { data } = response;
     const responseData = data as {
-      message: string;
+      message?: string;
     };
 
-    toast.success(responseData.message);
+    if (responseData.message) toast.success(responseData.message);
+
     return response;
   },
   (error: { response: IErrorResponse }) => {

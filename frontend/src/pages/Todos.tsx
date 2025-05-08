@@ -1,35 +1,39 @@
 import { Box, Button } from '@mui/material';
 import Page from '../components/Page';
 import Todo from '../components/Todo';
-import { useCallback, useEffect, useState } from 'react';
-import { getTodos as getTodosApi } from '../services/api';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { addTodoApi, getTodos as getTodosApi } from '../services/api';
 import { useNavigate } from 'react-router';
 import AddTodo from '../components/AddTodo';
-
-export interface ITodo {
-  id: string;
-  user_id: string;
-  title: string;
-  description: string;
-  is_completed: string;
-  created_at: string;
-}
+import { ITodo, IUser } from '../types';
+import { toast } from 'react-toastify';
 
 const Todos = () => {
   const navigate = useNavigate();
+
   const [todos, setTodos] = useState<ITodo[]>([]);
   const [openTodoForm, setOTF] = useState(false);
+  const user = useRef<IUser | null>(null);
 
   const getTodos = useCallback(async () => {
-    const user = sessionStorage.getItem('user');
+    const result = await getTodosApi(user.current?.id as string);
+    setTodos(result.data as ITodo[]);
+  }, []);
 
-    if (user) {
-      const userTyped: {
-        id: string;
-      } = JSON.parse(user);
+  const addTodo = async (title: string, description: string) => {
+    const result = await addTodoApi(user.current?.id as string, title, description);
 
-      const result = await getTodosApi(userTyped.id);
-      setTodos(result.data as ITodo[]);
+    if (result.status === 201) {
+      await getTodos();
+      toast.success('Todo added successfully');
+    }
+  };
+
+  useEffect(() => {
+    const data = sessionStorage.getItem('user');
+
+    if (data) {
+      user.current = JSON.parse(data);
     } else navigate('/login');
   }, [navigate]);
 
@@ -73,7 +77,7 @@ const Todos = () => {
         </Box>
       </Page>
 
-      <AddTodo open={openTodoForm} setOpen={setOTF} />
+      <AddTodo open={openTodoForm} setOpen={setOTF} addTodo={addTodo} />
     </>
   );
 };

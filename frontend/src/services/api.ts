@@ -10,3 +10,10 @@ export const login = (email: string, password: string) => {
 export const getTodos = (userId: string) => {
   return axiosInstance.get(`todos/${userId}`);
 };
+
+export const addTodoApi = (userId: string, title: string, description: string) => {
+  return axiosInstance.post(`todos/${userId}`, {
+    title,
+    description,
+  });
+};

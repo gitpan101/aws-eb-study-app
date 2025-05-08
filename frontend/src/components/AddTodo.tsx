@@ -31,11 +31,20 @@ const errorStyles: CSSProperties = {
   color: '#ED2939',
 };
 
-const AddTodo = ({ open = false, setOpen }: { open: boolean; setOpen: (value: boolean) => void }) => {
+const AddTodo = ({
+  open = false,
+  setOpen,
+  addTodo,
+}: {
+  open: boolean;
+  setOpen: (value: boolean) => void;
+  addTodo: (title: string, description: string) => Promise<void>;
+}) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -46,8 +55,11 @@ const AddTodo = ({ open = false, setOpen }: { open: boolean; setOpen: (value: bo
     }
   };
 
-  const onSubmit = ({ title, description }: { title: string; description: string }) => {
-    console.log(title, description);
+  const onSubmit = async ({ title, description }: { title: string; description: string }) => {
+    await addTodo(title, description);
+
+    reset();
+    setOpen(false);
   };
 
   return (

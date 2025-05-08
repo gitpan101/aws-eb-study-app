@@ -2,18 +2,22 @@ import { Box, Button } from '@mui/material';
 import Page from '../components/Page';
 import Todo from '../components/Todo';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { addTodoApi, editTodoApi, getTodos as getTodosApi } from '../services/api';
+import { addTodoApi, editTodoApi, deleteTodoApi, getTodos as getTodosApi } from '../services/api';
 import { useNavigate } from 'react-router';
-import AddTodo from '../components/AddTodo';
 import { ITodo, IUser } from '../types';
 import { toast } from 'react-toastify';
+
+import AddTodo from '../components/AddTodo';
+import DeleteTodo from '../components/DeleteTodo'; // Import the DeleteTodo component
 
 const Todos = () => {
   const navigate = useNavigate();
 
   const [todos, setTodos] = useState<ITodo[]>([]);
   const [openTodoForm, setOTF] = useState(false);
-  const [editingTodo, setEditingTodo] = useState<ITodo | null>(null); // State for editing
+  const [editingTodo, setEditingTodo] = useState<ITodo | null>(null);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false); // State for delete modal
+  const [todoToDelete, setTodoToDelete] = useState<string | null>(null); // State for the todo to delete
   const user = useRef<IUser | null>(null);
 
   const getTodos = useCallback(async () => {
@@ -39,9 +43,22 @@ const Todos = () => {
     }
   };
 
+  const deleteTodo = async (todoId: string) => {
+    const result = await deleteTodoApi(todoId);
+
+    if (result.status === 200) {
+      await getTodos();
+    }
+  };
+
   const handleEdit = (todo: ITodo) => {
-    setEditingTodo(todo); // Set the todo to be edited
-    setOTF(true); // Open the form
+    setEditingTodo(todo);
+    setOTF(true);
+  };
+
+  const handleDelete = (todoId: string) => {
+    setTodoToDelete(todoId);
+    setOpenDeleteModal(true);
   };
 
   useEffect(() => {
@@ -87,7 +104,12 @@ const Todos = () => {
           }}
         >
           {todos.map((todo) => (
-            <Todo key={todo.id} todo={todo} onEdit={() => handleEdit(todo)} />
+            <Todo
+              key={todo.id}
+              todo={todo}
+              onEdit={() => handleEdit(todo)}
+              onDelete={() => handleDelete(todo.id)} // Pass delete handler
+            />
           ))}
         </Box>
       </Page>
@@ -100,6 +122,8 @@ const Todos = () => {
         editingTodo={editingTodo}
         setEditingTodo={setEditingTodo}
       />
+
+      <DeleteTodo open={openDeleteModal} setOpen={setOpenDeleteModal} todoId={todoToDelete} deleteTodo={deleteTodo} />
     </>
   );
 };

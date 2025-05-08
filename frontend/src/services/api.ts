@@ -24,3 +24,7 @@ export const editTodoApi = (todoId: string, title: string, description: string) 
     description,
   });
 };
+
+export const deleteTodoApi = (todoId: string) => {
+  return axiosInstance.delete(`todos/${todoId}`);
+};

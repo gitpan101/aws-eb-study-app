@@ -1,7 +1,9 @@
-import { Box } from '@mui/material';
-import { ITodo } from '../pages/Todos';
+import { Box, IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 
-const Todo = ({ todo }: { todo: ITodo }) => {
+import { ITodo } from '../types';
+
+const Todo = ({ todo, onEdit }: { todo: ITodo; onEdit: () => void }) => {
   return (
     <Box
       sx={{
@@ -21,9 +23,16 @@ const Todo = ({ todo }: { todo: ITodo }) => {
         sx={{
           fontWeight: 'bold',
           marginBottom: '8px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         {todo.title}
+
+        <IconButton onClick={onEdit}>
+          <EditIcon color="action" fontSize="small" />
+        </IconButton>
       </Box>
 
       <Box

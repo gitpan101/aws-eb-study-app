@@ -17,3 +17,10 @@ export const addTodoApi = (userId: string, title: string, description: string) =
     description,
   });
 };
+
+export const editTodoApi = (todoId: string, title: string, description: string) => {
+  return axiosInstance.put(`todos/${todoId}`, {
+    title,
+    description,
+  });
+};

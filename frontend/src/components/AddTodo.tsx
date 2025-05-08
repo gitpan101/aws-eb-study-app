@@ -4,7 +4,7 @@ import DialogActions from '@mui/material/DialogActions';
 import CloseIcon from '@mui/icons-material/Close';
 
 import * as yup from 'yup';
-import { CSSProperties } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -22,23 +22,25 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 const schema = yup
   .object({
-    title: yup.string().required(),
-    description: yup.string().required(),
+    title: yup.string().required('Title is required'),
+    description: yup.string().required('Description is required'),
   })
   .required();
-
-const errorStyles: CSSProperties = {
-  color: '#ED2939',
-};
 
 const AddTodo = ({
   open = false,
   setOpen,
   addTodo,
+  editTodo,
+  editingTodo,
+  setEditingTodo,
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
   addTodo: (title: string, description: string) => Promise<void>;
+  editTodo: (todoId: string, title: string, description: string) => Promise<void>;
+  editingTodo: { id: string; title: string; description: string } | null;
+  setEditingTodo: (todo: null) => void;
 }) => {
   const {
     register,
@@ -49,14 +51,34 @@ const AddTodo = ({
     resolver: yupResolver(schema),
   });
 
+  useEffect(() => {
+    if (editingTodo) {
+      reset({
+        title: editingTodo.title,
+        description: editingTodo.description,
+      });
+    } else {
+      reset({
+        title: '',
+        description: '',
+      });
+    }
+  }, [editingTodo, reset]);
+
   const handleClose = (_event: unknown, reason: 'backdropClick' | 'escapeKeyDown') => {
     if (reason !== 'backdropClick') {
       setOpen(false);
+      setEditingTodo(null); // Clear editing state
     }
   };
 
   const onSubmit = async ({ title, description }: { title: string; description: string }) => {
-    await addTodo(title, description);
+    if (editingTodo) {
+      await editTodo(editingTodo.id, title, description);
+      setEditingTodo(null); // Clear editing state
+    } else {
+      await addTodo(title, description);
+    }
 
     reset();
     setOpen(false);
@@ -65,11 +87,14 @@ const AddTodo = ({
   return (
     <BootstrapDialog onClose={handleClose} aria-labelledby="dialog-title" open={open}>
       <DialogTitle sx={{ m: 0, p: 2 }} id="dialog-title">
-        Add Todo
+        {editingTodo ? 'Edit Todo' : 'Add Todo'}
       </DialogTitle>
       <IconButton
         aria-label="close"
-        onClick={() => setOpen(false)}
+        onClick={() => {
+          setOpen(false);
+          setEditingTodo(null); // Clear editing state
+        }}
         sx={(theme) => ({
           position: 'absolute',
           right: 8,
@@ -81,15 +106,24 @@ const AddTodo = ({
       </IconButton>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
-          <TextField sx={{ width: '100%' }} label="Title" {...register('title')} />
-          <p style={errorStyles}>{errors.title?.message}</p>
-
-          <TextField sx={{ width: '100%' }} label="Description" {...register('description')} />
-          <p style={errorStyles}>{errors.description?.message}</p>
+          <TextField
+            sx={{ width: '100%' }}
+            label="Title"
+            {...register('title')}
+            error={!!errors.title}
+            helperText={errors.title?.message}
+          />
+          <TextField
+            sx={{ width: '100%', mt: 2 }}
+            label="Description"
+            {...register('description')}
+            error={!!errors.description}
+            helperText={errors.description?.message}
+          />
         </DialogContent>
         <DialogActions>
           <Button type="submit" variant="contained">
-            Add
+            {editingTodo ? 'Update' : 'Add'}
           </Button>
         </DialogActions>
       </form>

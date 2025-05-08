@@ -2,7 +2,7 @@ import { Box, Button } from '@mui/material';
 import Page from '../components/Page';
 import Todo from '../components/Todo';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { addTodoApi, getTodos as getTodosApi } from '../services/api';
+import { addTodoApi, editTodoApi, getTodos as getTodosApi } from '../services/api';
 import { useNavigate } from 'react-router';
 import AddTodo from '../components/AddTodo';
 import { ITodo, IUser } from '../types';
@@ -13,6 +13,7 @@ const Todos = () => {
 
   const [todos, setTodos] = useState<ITodo[]>([]);
   const [openTodoForm, setOTF] = useState(false);
+  const [editingTodo, setEditingTodo] = useState<ITodo | null>(null); // State for editing
   const user = useRef<IUser | null>(null);
 
   const getTodos = useCallback(async () => {
@@ -27,6 +28,20 @@ const Todos = () => {
       await getTodos();
       toast.success('Todo added successfully');
     }
+  };
+
+  const editTodo = async (todoId: string, title: string, description: string) => {
+    const result = await editTodoApi(todoId, title, description);
+
+    if (result.status === 200) {
+      await getTodos();
+      toast.success('Todo updated successfully');
+    }
+  };
+
+  const handleEdit = (todo: ITodo) => {
+    setEditingTodo(todo); // Set the todo to be edited
+    setOTF(true); // Open the form
   };
 
   useEffect(() => {
@@ -72,12 +87,19 @@ const Todos = () => {
           }}
         >
           {todos.map((todo) => (
-            <Todo key={todo.id} todo={todo} />
+            <Todo key={todo.id} todo={todo} onEdit={() => handleEdit(todo)} />
           ))}
         </Box>
       </Page>
 
-      <AddTodo open={openTodoForm} setOpen={setOTF} addTodo={addTodo} />
+      <AddTodo
+        open={openTodoForm}
+        setOpen={setOTF}
+        addTodo={addTodo}
+        editTodo={editTodo}
+        editingTodo={editingTodo}
+        setEditingTodo={setEditingTodo}
+      />
     </>
   );
 };

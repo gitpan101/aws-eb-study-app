@@ -11,7 +11,7 @@ interface IErrorResponse extends ErrorResponse {
 }
 
 export const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080/api/',
+  baseURL: 'http://todo-app-dev.ap-south-1.elasticbeanstalk.com/api/',
 });
 
 axiosInstance.interceptors.request.use((config: Axios.AxiosXHRConfig<unknown>) => {

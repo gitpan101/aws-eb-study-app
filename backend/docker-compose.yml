@@ -1,6 +1,8 @@
 services:
   db:
-    image: postgres:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.db
     restart: always
     container_name: postgres
     environment:
@@ -24,3 +26,18 @@ services:
       - '6300:8080'
     volumes:
       - ./servers.json:/pgadmin4/servers.json
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/todos
+      JWT_SECRET: myjwtsecret
+      PORT: 8080
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db

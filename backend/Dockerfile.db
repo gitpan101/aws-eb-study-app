@@ -1,0 +1,2 @@
+FROM postgres:latest
+COPY src/db/seeding.sql /docker-entrypoint-initdb.d/

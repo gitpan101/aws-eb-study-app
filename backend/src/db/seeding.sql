@@ -1,5 +1,5 @@
 -- Create the users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -8,7 +8,7 @@ CREATE TABLE users (
 );
 
 -- Create the todos table
-CREATE TABLE todos (
+CREATE TABLE IF NOT EXISTS todos (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
